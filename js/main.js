@@ -102,6 +102,7 @@ Vue.component('product', {
            >
                Add to cart
            </button>    
+           <button v-on:click="subtractionToCart" :disabled="!inStock" :class="{ disabledButton: !inStock }">Subtraction to cart</button>
        </div>        
          <product-tabs :reviews="reviews"></product-tabs>
       </div>
@@ -118,13 +119,15 @@ Vue.component('product', {
                     variantId: 2234,
                     variantColor: 'green',
                     variantImage: "./img/vmSocks-green-onWhite.jpg",
-                    variantQuantity: 10
+                    variantQuantity: 10,
+                    price: 100
                 },
                 {
                     variantId: 2235,
                     variantColor: 'blue',
                     variantImage: "./img/vmSocks-blue-onWhite.jpg",
-                    variantQuantity: 0
+                    variantQuantity: 10,
+                    price: 200
                 }
             ],
             reviews: []
@@ -132,7 +135,10 @@ Vue.component('product', {
     },
     methods: {
         addToCart() {
-            this.$emit('add-to-cart', this.variants[this.selectedVariant].variantId)
+            this.$emit('add-to-cart', this.variants[this.selectedVariant].price)
+        },
+        subtractionToCart(){
+            this.$emit('subtraction-to-cart', this.variants[this.selectedVariant].variantId);
         },
         updateProduct(index) {
             this.selectedVariant = index
@@ -257,8 +263,19 @@ let app = new Vue({
         cart: []
     },
     methods: {
-        updateCart(id) {
-            this.cart.push(id)
+        updateCart(price) {
+            this.cart.push(price);
+            let add = function (arr) {
+                return arr.reduce((a, b) => a + b, 0);
+            };
+            let sum = add(this.cart);
+            for(let i = 0; i <= this.cart.length; ++i){
+                this.cart.shift();
+            }
+            this.cart.push(sum);
+        },
+        subtractionCart(){
+            this.cart.pop();
         }
     }
 })
